@@ -1,0 +1,147 @@
+<template>
+<div class="column is-mobile">
+     <div class="columns">
+    <div class="column is-half is-offset-one-quarter">
+  <div id="app" class="container">
+    <section>
+        <div class="card" animation="slide" aria-id="contentIdForA11y3">
+            <div class="card-content">
+                <h3 class="subtitle">Sign Up</h3>
+                <div class="content">
+                  <form>
+                    <b-field label="Email"
+                        :type="emailError == '' ? '' : emailError ? 'is-danger' : 'is-success'"
+                        :message="emailError == '' ? '' : emailError ? emailErrorMss : '' ">
+                        <b-input type="email"
+                            value=""
+                            maxlength="30"
+                            icon="email"
+                            v-model="auth.email">
+                        </b-input>
+                    </b-field>
+                    <b-field label="Password"
+                        :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
+                        :message="passError == '' ? '' : passError ? passErrorMss : '' ">
+                        <b-input type="password"
+                            value=""
+                            password-reveal
+                            icon="key"
+                            v-model="auth.password">
+                        </b-input>
+                    </b-field>
+                    <b-field label="Repeat Password"
+                        :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
+                        :message="passError == '' ? '' : passError ? passErrorMss : '' ">
+                        <b-input type="password"
+                            value=""
+                            password-reveal
+                            icon="key"
+                            v-model="auth.repeatPassword">
+                        </b-input>
+                    </b-field>
+                    <b-message v-if="temDisabled" type="is-danger" has-icon v-text="temDisabledMss"></b-message>
+                    <b-button @click="login" type="is-success">Register</b-button>
+
+                  </form>
+                </div>
+            </div>
+            <!-- <footer class="card-footer"> -->
+            <!-- </footer> -->
+        </div>
+    </section>
+    </div>
+    </div>
+        </div>
+
+</div>
+</template>
+
+<script>
+export default {
+  data() {
+      return {
+          emailError: '',
+          emailErrorMss: '',
+          passError: '',
+          passErrorMss: '',
+          temDisabled: '',
+          temDisabledMss: '',
+          auth: {
+            email: '',
+            password: '',
+            repeatPassword: ''
+          }
+      }
+  },
+  methods: {
+    login(){
+        let that = this;
+
+        if(that.auth.password === that.auth.repeatPassword){
+            this.$fire.auth.createUserWithEmailAndPassword(this.auth.email, this.auth.password)
+            .catch(function(error){
+                let message = error.message;
+                console.log(message)
+                if(message.includes("There is no user record corresponding to this identifier") || message.includes("auth/invalid-email")){
+                that.emailError = true;
+                    if(message.includes("There is no user record corresponding to this identifier")){ 
+                    that.emailErrorMss = "There isn't a user with this email";
+                    }
+                    else if(message.includes("The email address is badly formatted"))
+                    that.emailErrorMss = "The email format is invalid";
+                }
+                else
+                    if(message.includes("password")){
+                        that.passError = true;
+                        
+                        if(message.includes("The password is invalid"))
+                            that.passErrorMss = "The password is invalid";
+                        else
+                            if(message.includes("auth/weak-password"))
+                                that.passErrorMss = "Password should be at least 6 characters";
+                        }
+                    
+                    else
+                    if(message.includes("auth/too-many-requests")){
+                        that.temDisabled = true;
+                        that.temDisabledMss = "This account has been temporaly disabled due too many failed login attempts";
+                    }
+            }).then((user) => {
+                if(!that.emailError && !that.passError && !that.temDisabled)
+                that.$router.push('/')
+            })
+
+            setTimeout(() => {
+                that.emailError = '',
+                that.emailErrorMss = '',
+                that.passError = '',
+                that.passErrorMss = '',
+                that.temDisabled = '',
+                that.temDisabledMss = ''
+            }, 3500);
+        }
+        else{
+            that.temDisabled = true,
+            that.temDisabledMss = "Passwords doesn't match"
+
+            setTimeout(() => {
+                that.temDisabled = '',
+                that.temDisabledMss = ''
+            }, 3500);
+        }
+
+
+
+      
+      
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+#app{
+  padding-top: 100px;
+}
+</style>
+
