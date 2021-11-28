@@ -47,6 +47,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     'nuxt-buefy',
+    '@nuxtjs/axios',
     ['@nuxtjs/firebase',
       {
         config: {

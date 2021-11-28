@@ -1,145 +1,95 @@
 <template>
-    <Loading v-if="$fetchState.pending" />
+    <b-loading v-if="isLoading" :is-full-page="isFullPage" v-model="isLoading" :can-cancel="true"></b-loading>  <!-- v-if="$fetchState.pending"  -->
 
-    <div v-else class="container single-movie">
+    <div v-else class="columns is-mobile container single-movie">
+      <div class="column">
         <NuxtLink class="button" :to=" $route.params.index ? {name: 'index'} : {name: 'cart'}">Back</NuxtLink>
-        <div class="movie-info">
-            <div class="movie-img">
-                <img :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`" alt="">
-            </div>
-            <div class="movie-content">
-                <h1>Title: {{movie.title}}</h1>
-                <p class="movie-fact tagline ">
-                    <span>Tagline: </span>"{{movie.tagline}}"
+        <div class="columns is-mobile">
+          <div class="column is-4">
+            <figure class="is-4by3">
+              <b-image
+                :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`"
+                webp-fallback=".jpg"
+                ratio="2by3"
+              ></b-image>
+            </figure>
+          </div>
+          <div class="column is-8">
+              <div><h2 class="title is-2 has-text-white display">Title:</h2><h2 class="title is-2 has-text-white display"> {{movie.title}}</h2></div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Tagline:</p><p class="title is-4 has-text-white is-italic display"> "{{movie.tagline}}"</p></div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Released:</p><p class="title is-4 has-text-white display"> {{
+                      new Date(movie.release_date).toLocaleString('en-us', { 
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',    
+                      })
+                  }}
                 </p>
-                <p class="movie-fact">
-                    <span>Released:</span>
-                    {{
-                        new Date(movie.release_date).toLocaleString('en-us', { 
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',    
-                        })
-                    }}
+              </div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Duration:</p><p class="title is-4 has-text-white display"> {{movie.duration}} minutes</p></div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Revenue:</p><p class="title is-4 has-text-white display"> {{
+                    movie.revenue.toLocaleString('en-us', { 
+                    style: 'currency',
+                    currency: 'USD',   
+                    })
+                  }}
                 </p>
-                <p class="movie-fact">
-                    <span>Duration: </span>{{movie.duration}} minutes
+              </div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Overview:</p><p class="title is-4 has-text-white display"> {{movie.overview}}</p></div>
+              <div class="pt-3"><p class="title is-4 has-text-white is-underlined display">Price:</p><p class="title is-4 has-text-white display"> {{
+                    price.toLocaleString('en-us', { 
+                    style: 'currency',
+                    currency: 'USD',   
+                    })
+                  }}
                 </p>
-                <p class="movie-fact">
-                    <span>Revenue: </span>
-                    {{
-                        movie.revenue.toLocaleString('en-us', { 
-                        style: 'currency',
-                        currency: 'USD',   
-                        })
-                    }}
-                </p>
-                <p class="movie-fact">
-                    <span>Overview: </span>{{movie.overview}}
-                </p>
-                <p class="movie-fact">
-                    <span>Price: </span>{{
-                                            price.toLocaleString('en-us', { 
-                                            style: 'currency',
-                                            currency: 'USD',   
-                                            })
-                                          }}
-                </p>
-            </div>
+              </div>
+          </div>
         </div>
+      </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios'
 export default {
     name: "single-movie",
     head(){
         return {
-            title: this.movie.title,
         }
     },
     data(){
         return {
             movie: '',
-            price: 0
+            price: 0,
+            isLoading: false,
+            isFullPage: true
         }
     },
     async fetch(){
-        await this.getSingleMovie()  
-    },
-    fetchDelay:1000,
-    methods: {
-        async getSingleMovie(){
-            const data = axios.get(`https://api.themoviedb.org/3/movie/${this.$route.params.movieId}?api_key=093fe08de240901010beac682eac60f5&language=en-US`)
+      await this.getSingleMovie()
 
-            const result = await data
-            console.log(result.data)
-            this.movie = result.data
-            let x = 1
-            for (let i = 0; i < result.data.revenue.toString().length-1; i++) {
-              x = x*10
-            }
-            let amount = result.data.revenue/x;
-            this.price = amount
+    },
+    methods: {
+      async getSingleMovie(){
+        this.isLoading = true
+
+        let movie = await this.$axios.$get(`https://api.themoviedb.org/3/movie/${this.$route.params.movieId}?api_key=093fe08de240901010beac682eac60f5&language=en-US`)
+        .then(function( response ){
+            return response;
+        })
+        .catch(err => {
+          console.log('fail');
+          console.log(err)
+        })
+        this.movie = movie
+        let x = 1
+        for (let i = 0; i < movie.revenue.toString().length-1; i++) {
+          x = x*10
         }
-    }
+        let amount = movie.revenue/x;
+        this.price = amount
+        this.isLoading = false
+      }
+  }
 }
 </script>
-
-<style lang="scss" scoped>
-.single-movie {
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 32px 16px;
-  .button {
-    align-self: flex-start;
-    margin-bottom: 32px;
-  }
-  .movie-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    color: #fff;
-    @media (min-width: 800px) {
-      flex-direction: row;
-      align-items: flex-start;
-    }
-    .movie-img {
-      img {
-        max-height: 500px;
-        width: 100%;
-        @media (min-width: 800px) {
-          max-height: 700px;
-          width: initial;
-        }
-      }
-    }
-    .movie-content {
-      h1 {
-        font-size: 56px;
-        font-weight: 400;
-      }
-      .movie-fact {
-        margin-top: 12px;
-        font-size: 20px;
-        line-height: 1.5;
-        span {
-          font-weight: 600;
-          text-decoration: underline;
-        }
-      }
-      .tagline {
-        font-style: italic;
-        span {
-          font-style: normal;
-        }
-      }
-    }
-  }
-}
-</style>

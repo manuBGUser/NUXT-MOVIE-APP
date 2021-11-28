@@ -1,7 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Karla:wght@200;300;400;500;600&display=swap');
+@import 'components/mixins';
+
+$backColorRed: #c92502;
+$transparent: transparent;
+$noneValue: none;
+$backColorBlack: #211f1f;
+$valuePx_8: 8px;
+$colorWhite: #fff;
+$absolutPos: absolute;
 
 * {
-  margin: 0;
+  @include margin_0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Karla', sans-serif;
@@ -19,21 +28,22 @@
 }
 
 .app {
-  background-color: #211f1f;
+  background-color: $backColorBlack;
   min-height: 100vh;
 }
 
 .button {
+  @include mix2;
   display: inline-block;
-  text-decoration: none;
+  text-decoration: $noneValue;
   color: inherit;
-  padding: 8px 16px;
-  background-color: #c92502;
-  border: none;
-  color: #fff;
+  padding: $valuePx_8 16px;
+  background-color: $backColorRed;
+  border: $noneValue;
   border-radius: 4px;
   cursor: pointer;
   transition: 0.3s ease all;
+  color: $colorWhite;
 
   &:hover {
     background-color: #891b02;
@@ -41,11 +51,11 @@
 }
 
 .button-light {
-  background-color: transparent;
-  border: 1px solid #c92502;
+  background-color: $transparent;
+  border: 1px solid $backColorRed;
 
   &:hover {
-    border-color: transparent;
+    border-color: $transparent;
   }
 }
 
@@ -54,3 +64,191 @@
   margin: 0 auto;
 }
 
+//login and logout
+#app{
+  padding-top: 100px;
+}
+
+//index
+.search {
+  padding: 32px 0px;
+  input {
+    max-width: 350px;
+    border: $noneValue;
+    &:focus {
+      outline: $noneValue;
+    }
+  }
+}
+
+//navbar
+div.buttons > .button:nth-child(2), div.buttons > .button:nth-child(3) {
+  color: $backColorRed;
+}
+.email{
+  padding-right: 10px;
+  padding-bottom: 5px;
+}
+
+//_movie
+.display {
+  display: inline;
+}
+.single-movie {
+  min-height: 100vh;
+  padding: 64px 16px;
+  .button {
+    align-self: flex-start;
+    @include margin_button(32px);
+  }
+}
+
+//cart
+.movies {
+  padding: 32px 16px;
+  .message{
+    @include margin_button(15px);
+  }
+  .h3-total{
+    @include margin_top($valuePx_8);
+    @include margin_button($valuePx_8);
+    color:  $backColorBlack;
+    font-size: 30px;
+    text-align: center;
+  }
+  .center {
+    @include margin_0;
+    position: $absolutPos;
+    top: 50%;
+    left: 40%;
+    margin-top: 30px;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+  .button-pay{
+    width: 150px;
+  }
+}
+
+//movie comp
+.movie-img {
+  position: relative;
+  overflow: hidden;
+  &:hover {
+    .overview {
+      transform: translateY(0);
+    }
+  }
+  .review {
+    @include mix2;
+    position: $absolutPos;
+    top: 0;
+    left: 0;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: $backColorRed;
+    border-radius: 0 0 16px 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  .overview {
+    line-height: 1.5;
+    position: $absolutPos;
+    bottom: 0;
+    background-color: rgba(201, 38, 2, 0.9);
+    padding: 12px;
+    color: $colorWhite;
+    transform: translateY(100%);
+    transition: 0.3s ease-in-out all;
+  }
+}
+.info {
+  margin-top: auto;
+  .title {
+    @include margin_top($valuePx_8);
+    color: $colorWhite;
+    font-size: 20px;
+  }
+  .release {
+    @include margin_top($valuePx_8);
+    color: #c9c9c9;
+  }
+  .button {
+    @include margin_top($valuePx_8);
+  }
+  .button-r{
+    float: right;
+  }
+  .revenue{
+    color: white;
+    float: right;
+    font-size: 16px;
+  }
+}
+
+//hero comp
+.hero {
+  height: 400px;
+  position: relative;
+  @media (min-width: 750px) {
+    height: 500px;
+  }
+  &::after {
+    content: '';
+    position: $absolutPos;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .text-container {
+    z-index: 9;
+    position: $absolutPos;
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .text {
+      padding: 0 16px;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .mini-heading {
+      font-weight: 600;
+      font-size: 18px;
+      text-transform: uppercase;
+      color: $backColorRed;
+      @include margin_button($valuePx_8);
+      @media (min-width: 750px) {
+        font-size: 22px;
+      }
+    }
+    h1 {
+      color: $colorWhite;
+      font-size: 64px;
+      font-weight: 200;
+      @include margin_button($valuePx_8);
+      @media (min-width: 750px) {
+        font-size: 84px;
+      }
+      span {
+        font-weight: 500;
+      }
+    }
+    .button {
+      font-size: 20px;
+      align-self: flex-start;
+    }
+  }
+}

@@ -12,7 +12,7 @@
             <b-navbar-item tag="div">
                 <div class="buttons">
                     <p class="email" v-if="user">{{user.email}}</p>
-                    <nuxt-link v-if="!user" class="button button-light" to="/signup">Sign up</nuxt-link>
+                    <nuxt-link v-if="!user" class="button" to="/signup">Sign up</nuxt-link>
 
                     <nuxt-link v-if="!user" class="button is-light" to="/login">Sign In</nuxt-link>
                   
@@ -37,7 +37,7 @@ export default {
     },
     mounted(){
         this.$fire.auth.onAuthStateChanged(user => {
-            console.log(user)
+            // console.log(user)
             this.user = user
         })
     },
@@ -55,13 +55,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss" scoped>
-.button {
-    color: #c92502
-}
-.email{
-    padding-right: 10px;
-    padding-bottom: 5px;
-}
-</style>

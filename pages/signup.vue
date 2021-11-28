@@ -1,85 +1,93 @@
 <template>
-<div class="column is-mobile">
-     <div class="columns">
-    <div class="column is-half is-offset-one-quarter">
-  <div id="app" class="container">
-    <section>
-        <div class="card" animation="slide" aria-id="contentIdForA11y3">
-            <div class="card-content">
-                <h3 class="subtitle">Sign Up</h3>
-                <div class="content">
-                  <form>
-                    <b-field label="Email"
-                        :type="emailError == '' ? '' : emailError ? 'is-danger' : 'is-success'"
-                        :message="emailError == '' ? '' : emailError ? emailErrorMss : '' ">
-                        <b-input type="email"
-                            value=""
-                            maxlength="30"
-                            icon="email"
-                            v-model="auth.email">
-                        </b-input>
-                    </b-field>
-                    <b-field label="Password"
-                        :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
-                        :message="passError == '' ? '' : passError ? passErrorMss : '' ">
-                        <b-input type="password"
-                            value=""
-                            password-reveal
-                            icon="key"
-                            v-model="auth.password">
-                        </b-input>
-                    </b-field>
-                    <b-field label="Repeat Password"
-                        :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
-                        :message="passError == '' ? '' : passError ? passErrorMss : '' ">
-                        <b-input type="password"
-                            value=""
-                            password-reveal
-                            icon="key"
-                            v-model="auth.repeatPassword">
-                        </b-input>
-                    </b-field>
-                    <b-message v-if="temDisabled" type="is-danger" has-icon v-text="temDisabledMss"></b-message>
-                    <b-button @click="login" type="is-success">Register</b-button>
+    <div>
+        <b-loading v-if="isLoading" :is-full-page="isFullPage" v-model="isLoading" :can-cancel="true"></b-loading>  <!-- v-if="$fetchState.pending"  -->
+        <div class="column is-mobile">
+            <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+                <div id="app" class="container">
+                <section>
+                    <div class="card" animation="slide" aria-id="contentIdForA11y3">
+                        <div class="card-content">
+                            <h3 class="subtitle">Sign Up</h3>
+                            <div class="content">
+                            <form>
+                                <b-field label="Email"
+                                    :type="emailError == '' ? '' : emailError ? 'is-danger' : 'is-success'"
+                                    :message="emailError == '' ? '' : emailError ? emailErrorMss : '' ">
+                                    <b-input type="email"
+                                        value=""
+                                        maxlength="30"
+                                        icon="email"
+                                        v-model="auth.email">
+                                    </b-input>
+                                </b-field>
+                                <b-field label="Password"
+                                    :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
+                                    :message="passError == '' ? '' : passError ? passErrorMss : '' ">
+                                    <b-input type="password"
+                                        value=""
+                                        password-reveal
+                                        icon="key"
+                                        v-model="auth.password">
+                                    </b-input>
+                                </b-field>
+                                <b-field label="Repeat Password"
+                                    :type="passError == '' ? '' : passError ? 'is-danger' : 'is-success'"
+                                    :message="passError == '' ? '' : passError ? passErrorMss : '' ">
+                                    <b-input type="password"
+                                        value=""
+                                        password-reveal
+                                        icon="key"
+                                        v-model="auth.repeatPassword">
+                                    </b-input>
+                                </b-field>
+                                <b-message v-if="temDisabled" type="is-danger" has-icon v-text="temDisabledMss"></b-message>
+                                <b-button @click="login" type="is-success">Register</b-button>
 
-                  </form>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 </div>
             </div>
-            <!-- <footer class="card-footer"> -->
-            <!-- </footer> -->
-        </div>
-    </section>
-    </div>
-    </div>
-        </div>
+            </div>
 
-</div>
+        </div>
+    </div>
+    
 </template>
 
 <script>
 export default {
   data() {
       return {
-          emailError: '',
-          emailErrorMss: '',
-          passError: '',
-          passErrorMss: '',
-          temDisabled: '',
-          temDisabledMss: '',
-          auth: {
-            email: '',
-            password: '',
-            repeatPassword: ''
-          }
+        emailError: '',
+        emailErrorMss: '',
+        passError: '',
+        passErrorMss: '',
+        temDisabled: '',
+        temDisabledMss: '',
+        auth: {
+        email: '',
+        password: '',
+        repeatPassword: ''
+        },
+        isLoading: false,
+        isFullPage: true
       }
   },
   methods: {
     login(){
+        this.isLoading = true
+
         let that = this;
 
         if(that.auth.password === that.auth.repeatPassword){
             this.$fire.auth.createUserWithEmailAndPassword(this.auth.email, this.auth.password)
             .catch(function(error){
+                that.isLoading = false
+
                 let message = error.message;
                 console.log(message)
                 if(message.includes("There is no user record corresponding to this identifier") || message.includes("auth/invalid-email")){
@@ -107,8 +115,12 @@ export default {
                         that.temDisabledMss = "This account has been temporaly disabled due too many failed login attempts";
                     }
             }).then((user) => {
-                if(!that.emailError && !that.passError && !that.temDisabled)
-                that.$router.push('/')
+                if(!that.emailError && !that.passError && !that.temDisabled){
+                    that.$router.push('/')
+                    setTimeout(() => {
+                        this.isLoading = false
+                    }, 500)
+                }
             })
 
             setTimeout(() => {
@@ -138,10 +150,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-#app{
-  padding-top: 100px;
-}
-</style>
-

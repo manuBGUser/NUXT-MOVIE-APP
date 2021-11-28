@@ -1,0 +1,17 @@
+@mixin margin_0 {
+    margin: 0;
+  }
+
+@mixin mix2 {
+    color: $colorWhite;
+    display: flex;
+    justify-content: center;
+}
+
+@mixin margin_button($value) {
+    margin-bottom: $value;
+}
+
+@mixin margin_top($value) {
+    margin-top: $value;
+}
